@@ -1,11 +1,22 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const PORT = process.env.PORT || 5000;
+const {v4: uuidv4} = require("uuid");
+// import {v4 as uuidv4} from "uuid";
+
 const server = app.listen(PORT, ()=>{
     console.log(`the server is running on port ${PORT}`)
 });
 const socket = require("socket.io");
 const io = socket(server);
+
+
+// app.use(express.static(path.join(__dirname, 'build')));
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
+
 
 
 
@@ -128,4 +139,28 @@ io.on("connection", socket=>{
         }
     })
 
+
+
+    //////////////////////chat room/////////////////////////
+    socket.on("message", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(roomID).emit("message", {msg: data, id: socket.id, uuId: uuidv4()});
+    })
+
+    socket.on("typing", data=>{
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("typing", socket.id);
+    })
+
+    socket.on("stopped typing", data=>{
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("stopped typing", "");
+    })
+
+    socket.on("message deleted", data=>{
+        const roomID = userRoom[socket.id];
+        const deletedMsgId = data;
+        io.to(roomID).emit("message deleted", deletedMsgId);
+    })
 })
