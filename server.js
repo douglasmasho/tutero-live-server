@@ -12,13 +12,6 @@ const socket = require("socket.io");
 const io = socket(server);
 
 
-// app.use(express.static(path.join(__dirname, 'build')));
-// app.get('/*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-
-
-
 
 const rooms = {};
 /*
@@ -40,6 +33,16 @@ userRoom{
     userID: roomID,
 }
 */ 
+
+const roomMessages = {};
+
+/*
+roomMessages{
+    roomId: [{msgObj, msgObj, msgObj}],
+    roomId: [{msgObj, msgObj, msgObj}] 
+}
+
+*/
 
 io.on("connection", socket=>{
     console.log(`the socket ${socket.id} has connected`);
@@ -143,9 +146,22 @@ io.on("connection", socket=>{
 
     //////////////////////chat room/////////////////////////
     socket.on("message", data=>{
-        const roomID = userRoom[socket.id];
-        const userID = rooms[roomID].find(id=> id !== socket.id);
-        io.to(roomID).emit("message", {msg: data, id: socket.id, uuId: uuidv4()});
+        const roomID = userRoom[socket.id],
+        messageObj = {
+            //instead of id being the socket id, it should be th userName of the user
+            msg: data, 
+            id: socket.id,
+            uuId: uuidv4()
+        }
+        //add the message obj to the roomMessages object>array
+        //sheck if this room's messages exist, if not create one with the new message
+        if(roomMessages[roomID]){
+            roomMessages[roomID].push(messageObj) 
+        }else{
+            roomMessages[roomID] = [messageObj]
+        }
+        //send to the room
+        io.to(roomID).emit("message", messageObj);
     })
 
     socket.on("typing", data=>{
@@ -162,5 +178,21 @@ io.on("connection", socket=>{
         const roomID = userRoom[socket.id];
         const deletedMsgId = data;
         io.to(roomID).emit("message deleted", deletedMsgId);
+    })
+
+    //listen to request for the room's messages
+    socket.on("room messages", data=>{
+        //find the messages array
+        let messagesArr;
+        const roomID = userRoom[socket.id];
+        console.log(userRoom)
+        if(roomMessages[roomID]){
+            messagesArr = roomMessages[roomID];
+        }else{
+            messagesArr = [];
+        }
+        // console.log(messagesArr)
+        //send back the room's messages to that specific user
+        socket.emit("room messages", messagesArr);
     })
 })
