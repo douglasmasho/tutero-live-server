@@ -176,7 +176,10 @@ io.on("connection", socket=>{
 
     socket.on("message deleted", data=>{
         const roomID = userRoom[socket.id];
+        //delete the messages from the roomMessages array;
         const deletedMsgId = data;
+        const newArr = roomMessages[roomID].filter(obj=>obj.uuId !== deletedMsgId);
+        roomMessages[roomID] = newArr;
         io.to(roomID).emit("message deleted", deletedMsgId);
     })
 
