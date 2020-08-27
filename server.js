@@ -198,4 +198,11 @@ io.on("connection", socket=>{
         //send back the room's messages to that specific user
         socket.emit("room messages", messagesArr);
     })
+
+    //listen to stopYT session message
+    socket.on("startYTSession", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("startYTSession", "");
+    })
 })
