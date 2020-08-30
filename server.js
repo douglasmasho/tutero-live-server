@@ -86,6 +86,12 @@ io.on("connection", socket=>{
         io.to(data.callerID).emit("recipient returned signal", {recipientID: socket.id, signal: data.signal})
     })
 
+    socket.on("connection established", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("connection established", "");
+    })
+
     socket.on("disconnecting", ()=>{
         const room = userRoom[socket.id];
 
@@ -199,10 +205,18 @@ io.on("connection", socket=>{
         socket.emit("room messages", messagesArr);
     })
 
+    //////////////////yt share
     //listen to stopYT session message
     socket.on("startYTSession", data=>{
         const roomID = userRoom[socket.id];
         const userID = rooms[roomID].find(id=> id !== socket.id);
         io.to(userID).emit("startYTSession", "");
+    })
+
+    //listen to myIframeReady meassage
+    socket.on("myIframeReady", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("peerIframeReady", "")  
     })
 })
