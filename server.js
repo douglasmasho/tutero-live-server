@@ -219,4 +219,29 @@ io.on("connection", socket=>{
         const userID = rooms[roomID].find(id=> id !== socket.id);
         io.to(userID).emit("peerIframeReady", "")  
     })
+
+    ///////////////////screen share
+    socket.on("sending signal SS", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("caller sending signal SS", {
+            signal: data.signal,
+            callerID: socket.id
+        })
+    })
+
+    socket.on("returning signal SS", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("recipient returned signal SS", {
+            signal: data.signal
+        })
+    })
+
+    socket.on("connection made SS", data=>{
+        const roomID = userRoom[socket.id];
+        const userID = rooms[roomID].find(id=> id !== socket.id);
+        io.to(userID).emit("connection made SS", "")
+    })
+
 })
