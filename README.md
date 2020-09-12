@@ -6,7 +6,7 @@ A Video chat web app for online tutorials and pair study sessions. This app come
 
 
 ## Important
-this is the client-side, the server side of the application is needed to run this. The server side code can be found [here](https://github.com/douglasmasho/tutero-live-client)
+this is the server-side, the server side of the application is needed to run this. The client side code can be found [here](https://github.com/douglasmasho/tutero-live-client)
 
 
 ## Technologies used
