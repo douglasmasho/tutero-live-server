@@ -36,6 +36,9 @@ userRoom{
 
 const roomMessages = {};
 
+
+console.log(roomMessages)
+
 /*
 roomMessages{
     roomId: [{msgObj, msgObj, msgObj}],
