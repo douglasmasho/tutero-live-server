@@ -79,6 +79,8 @@ io.on("connection", socket=>{
 
     })
 
+    // const roomID = userRoom[socket.id];
+
     socket.on("sending signal", data=>{
         //send the signal over to the old users, include the callerID so that they know who to respond to
         io.to(data.recipient).emit("caller sending signal", {callerID: socket.id, signal: data.signal});
@@ -96,9 +98,8 @@ io.on("connection", socket=>{
     })
 
     socket.on("disconnecting", ()=>{
-        const room = userRoom[socket.id];
-
-        socket.to(room).emit("client disconnected", socket.id);
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("client disconnected", socket.id);
     })
     
     socket.on("disconnect", ()=>{
@@ -241,10 +242,44 @@ io.on("connection", socket=>{
         })
     })
 
+    
     socket.on("connection made SS", data=>{
         const roomID = userRoom[socket.id];
         const userID = rooms[roomID].find(id=> id !== socket.id);
         io.to(userID).emit("connection made SS", "")
+    });
+    ////////////////////////live canvas
+    socket.on("hello", (data)=>{
+
+        console.log(data)
+    });
+    socket.on("draw", data=>{
+        const roomID = userRoom[socket.id];
+       socket.to(roomID).emit("draw", data);
+ 
     })
+
+    socket.on("erase", data=>{
+        const roomID = userRoom[socket.id];
+            socket.to(roomID).emit("erase", data);
+        
+    });
+
+    socket.on("unerase", data=>{
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("unerase", data);
+    });
+
+    socket.on("clear", data=>{
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("clear");
+    });
+
+    socket.on("scroll", data=>{
+        const roomID = userRoom[socket.id];
+        socket.to(roomID).emit("scroll", data);
+    });
+
+    
 
 })
