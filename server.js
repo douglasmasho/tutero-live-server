@@ -4,15 +4,21 @@ const path = require("path");
 const PORT = process.env.PORT || 5000;
 const {v4: uuidv4} = require("uuid");
 // import {v4 as uuidv4} from "uuid";
+require("dotenv").config();
+const fetch = require("node-fetch");
+const axios = require("axios")
 
+
+
+console.log(process.env.YT_API_KEY)
 const server = app.listen(PORT, ()=>{
     console.log(`the server is running on port ${PORT}`)
 });
+
+// console.log
+
 const socket = require("socket.io");
 const io = socket(server);
-
-
-
 const rooms = {};
 /*
 rooms{
@@ -224,6 +230,21 @@ io.on("connection", socket=>{
         io.to(userID).emit("peerIframeReady", "")  
     })
 
+    //listen to request for a playlist
+    socket.on("Fetch playlist", data=>{
+        console.log(data)
+        // io.to(socket.id).emit("axios resp", "hello")
+        fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${data}&key=${process.env.YT_API_KEY}`).then(resp=>{
+             return resp.json()
+        
+          }).then(resp=>{
+              console.log(resp);
+              io.to(socket.id).emit("playlist resp", resp)
+          }).catch(e=>{
+              console.log(e)
+          })
+    })
+
     ///////////////////screen share
     socket.on("sending signal SS", data=>{
         const roomID = userRoom[socket.id];
@@ -279,6 +300,7 @@ io.on("connection", socket=>{
         const roomID = userRoom[socket.id];
         socket.to(roomID).emit("scroll", data);
     });
+
 
     
 
