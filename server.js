@@ -6,7 +6,8 @@ const {v4: uuidv4} = require("uuid");
 // import {v4 as uuidv4} from "uuid";
 require("dotenv").config();
 const fetch = require("node-fetch");
-const axios = require("axios")
+const axios = require("axios");
+const fs = require("fs");
 
 
 
@@ -52,6 +53,8 @@ roomMessages{
 }
 
 */
+
+
 
 io.on("connection", socket=>{
     console.log(`the socket ${socket.id} has connected`);
@@ -301,6 +304,65 @@ io.on("connection", socket=>{
         socket.to(roomID).emit("scroll", data);
     });
 
+
+    ////////////New fileshare;
+
+    socket.on("upload complete", ()=>{
+        socket.broadcast.emit("end upload") //to peer 2
+    })
+
+    socket.on("request new slice from peer", data=>{
+        socket.broadcast.emit("new slice request", data);
+    });
+
+    socket.on("slice upload", data=>{
+        console.log("received slice", data);
+      //send slice to the other client
+      socket.broadcast.emit("slice received", data);
+
+
+    //   if(!files[data.name]){
+    //       files[data.name] = Object.assign({}, struct, data);
+    //       files[data.name].data = []
+    //       console.log(files[data.name]);
+    //   }
+
+    //   const newBuffer = Buffer.from(new Uint8Array(data.data));
+    //   console.log(newBuffer);
+    //   console.log(typeof(newBuffer))
+
+    //   ///push it
+    //   files[data.name].data.push(newBuffer);
+    //   ///increment the slice prop
+    //   files[data.name].slice++;
+
+    //   if(files[data.name].slice * 100000 >= files[data.name].size){
+    //       ///send the file to the other client
+    //       console.log(files[data.name].data);
+    //       console.log("the file upload is complete");
+    //       socket.emit("upload complete", "")
+    //       var fileBuffer = Buffer.concat(files[data.name].data); 
+    
+    //       fs.writeFile(__dirname + '/tmp/'+ data.name, fileBuffer, (err) => { 
+    //           delete files[data.name]; 
+              
+    //           if (err){
+    //               console.log(err)
+    //             return socket.emit('upload error'); 
+    //           } else{
+    //             socket.emit("upload ended")
+    //           }
+    //       });
+    //   }else{
+    //       ///the file upload is not complete, ask for another slice from the client
+    //       socket.emit("new slice request", {
+    //           currentSlice: files[data.name].slice
+    //       })      
+    //   }
+
+
+
+    })
 
     
 
